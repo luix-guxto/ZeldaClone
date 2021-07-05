@@ -20,24 +20,23 @@ public class Player extends Canvas {
 	public static Rectangle player = new Rectangle(Game.WIDTH / 2 - 8*Game.ESCALA, Game.HEIGTH / 2 - 8*Game.ESCALA, 16*Game.ESCALA, 16*Game.ESCALA),
 							arma = new Rectangle(-500, -500, 1, 1),
 							escudo = new Rectangle(-500, -500, 1, 1);
-
-	private static byte velocidade = 2,
+	private static final byte velocidade = 2;
+	private static byte
 						delay_up = 0,
 						delay_down = 0,
+						delay_colet = 0,
 						delay_left = 0,
 						delay_rigth = 0,
 						delay_atack = 0,
-						up_sprite = 0,
-						left_sprite = 0,
-						rigth_sprite = 0,
-						down_sprite = 0,
+						anima_sprite = 0,
 						atack_sprite = 0,
 						defesa_sprite = 0,
+						colet_sprite = 0,
 						arma_n = 0,
 						time_music = 0;
 
 
-	private static boolean
+	public static boolean
 	up = true,
 	left = false,
 	rigth = false,
@@ -49,36 +48,40 @@ public class Player extends Canvas {
 	mute = false;
 
 	public static void movimentar(boolean ups, boolean downs, boolean rigths, boolean lefts) {
+	if(!coletando) {
 		if (ups) {
-			up = true;
-			down = left = rigth = false;
+			if (!defendendo && !atacando) {
+				up = true;
+				down = left = rigth = false;
+			}
 			delay_up++;
-			if (delay_up > espera_movimentacao) {
-				switch (up_sprite) {
-				case 0:
-					up_sprite = 1;
-					break;
-				case 1:
-					up_sprite = 0;
-					break;
+			if (delay_up > espera_movimentacao && !lefts && !rigths) {
+				switch (anima_sprite) {
+					case 0:
+						anima_sprite = 1;
+						break;
+					case 1:
+						anima_sprite = 0;
+						break;
 				}
 				delay_up = 0;
 			}
 
 			player.y -= velocidade;
 		} else if (downs) {
-
-			down = true;
-			up = left = rigth = false;
+			if (!defendendo && !atacando) {
+				down = true;
+				up = left = rigth = false;
+			}
 			delay_down++;
-			if (delay_down > espera_movimentacao) {
-				switch (down_sprite) {
-				case 0:
-					down_sprite = 1;
-					break;
-				case 1:
-					down_sprite = 0;
-					break;
+			if (delay_down > espera_movimentacao && !lefts && !rigths) {
+				switch (anima_sprite) {
+					case 0:
+						anima_sprite = 1;
+						break;
+					case 1:
+						anima_sprite = 0;
+						break;
 				}
 				delay_down = 0;
 			}
@@ -87,35 +90,38 @@ public class Player extends Canvas {
 		}
 
 		if (rigths) {
-
-			rigth = true;
-			down = left = up = false;
+			if (!defendendo && !atacando) {
+				rigth = true;
+				down = left = up = false;
+			}
 			delay_rigth++;
 			if (delay_rigth > espera_movimentacao) {
-				switch (rigth_sprite) {
-				case 0:
-					rigth_sprite = 1;
-					break;
-				case 1:
-					rigth_sprite = 0;
-					break;
+				switch (anima_sprite) {
+					case 0:
+						anima_sprite = 1;
+						break;
+					case 1:
+						anima_sprite = 0;
+						break;
 				}
 				delay_rigth = 0;
 			}
 
 			player.x += velocidade;
 		} else if (lefts) {
-			left = true;
-			down = up = rigth = false;
+			if (!defendendo && !atacando) {
+				left = true;
+				down = up = rigth = false;
+			}
 			delay_left++;
 			if (delay_left > espera_movimentacao) {
-				switch (left_sprite) {
-				case 0:
-					left_sprite = 1;
-					break;
-				case 1:
-					left_sprite = 0;
-					break;
+				switch (anima_sprite) {
+					case 0:
+						anima_sprite = 1;
+						break;
+					case 1:
+						anima_sprite = 0;
+						break;
 				}
 				delay_left = 0;
 			}
@@ -130,10 +136,7 @@ public class Player extends Canvas {
 			if (delay_up > espera_movimentacao && delay_down > espera_movimentacao && delay_rigth > espera_movimentacao
 					&& delay_left > espera_movimentacao) {
 
-				up_sprite = 0;
-				down_sprite = 0;
-				left_sprite = 0;
-				rigth_sprite = 0;
+				anima_sprite = 0;
 
 				delay_up = 0;
 				delay_down = 0;
@@ -142,6 +145,7 @@ public class Player extends Canvas {
 
 			}
 		}
+	}
 	}
 
 	private static void limits() {
@@ -163,18 +167,18 @@ public class Player extends Canvas {
 		limits();
 	}
 
-	public static Graphics animacao(Graphics g) {
+	public static void animacao(Graphics g) {
 		escudo.x=escudo.y=-500;
 		escudo.width=escudo.height=1;
 		if (!atacando && !defendendo && !coletando) {
 			if (up) {
-				g.drawImage(Sprites.move_up[up_sprite], player.x, player.y, player.width, player.height, null);
+				g.drawImage(Sprites.move_up[anima_sprite], player.x, player.y, player.width, player.height, null);
 			} else if (down) {
-				g.drawImage(Sprites.move_down[down_sprite], player.x, player.y, player.width, player.height, null);
+				g.drawImage(Sprites.move_down[anima_sprite], player.x, player.y, player.width, player.height, null);
 			} else if (rigth) {
-				g.drawImage(Sprites.move_H[rigth_sprite], player.x, player.y, player.width, player.height, null);
+				g.drawImage(Sprites.move_H[anima_sprite], player.x, player.y, player.width, player.height, null);
 			} else {
-				g.drawImage(Sprites.move_H[left_sprite], player.x + player.width, player.y, -player.width, player.height, null);
+				g.drawImage(Sprites.move_H[anima_sprite], player.x + player.width, player.y, -player.width, player.height, null);
 			}
 		}
 		if(!atacando && defendendo && !coletando) {
@@ -184,25 +188,25 @@ public class Player extends Canvas {
 				escudo.width=player.width;
 				escudo.x=player.x;
 				escudo.y=player.y-5;
-				g.drawImage(Sprites.move_up[up_sprite], player.x, player.y, player.width, player.height, null);
+				g.drawImage(Sprites.move_up[anima_sprite], player.x, player.y, player.width, player.height, null);
 			}else if(down) {
 				escudo.height=5;
 				escudo.width=player.width;
 				escudo.x=player.x;
 				escudo.y=player.y+player.height;
-				g.drawImage(Sprites.shield_down[down_sprite], player.x, player.y, player.width, player.height, null);
+				g.drawImage(Sprites.shield_down[anima_sprite], player.x, player.y, player.width, player.height, null);
 			}else if(rigth) {
 				escudo.height=player.height;
 				escudo.width=5;
 				escudo.x=player.x+player.width;
 				escudo.y=player.y;
-				g.drawImage(Sprites.shield_H[rigth_sprite], player.x, player.y, player.width, player.height, null);
+				g.drawImage(Sprites.shield_H[anima_sprite], player.x, player.y, player.width, player.height, null);
 			}else {
 				escudo.y=player.y;
 				escudo.height=player.height;
 				escudo.width=5;
 				escudo.x=player.x-5;
-				g.drawImage(Sprites.shield_H[left_sprite], player.x + player.width, player.y, -player.width, player.height, null);
+				g.drawImage(Sprites.shield_H[anima_sprite], player.x + player.width, player.y, -player.width, player.height, null);
 			}
 		}
 		if (atacando && !defendendo && !coletando) {
@@ -497,18 +501,18 @@ public class Player extends Canvas {
 
 		if(coletando) {
 
-			g.drawImage(Sprites.item[atack_sprite], player.x, player.y, player.width, player.height, null);
+			g.drawImage(Sprites.item[colet_sprite], player.x, player.y, player.width, player.height, null);
 
-			delay_atack++;
-			if(delay_atack>espera_music1) {
-				atack_sprite=1;
+			delay_colet++;
+			if(delay_colet>espera_music1) {
+				colet_sprite=1;
 				time_music++;
 			}
 			if(mute) {
 				if(time_music>espera_music) {
 					time_music=0;
 					coletando=false;
-					delay_atack = atack_sprite = 0;
+					delay_colet = colet_sprite = 0;
 				}
 			}
 			else if(atack_sprite == 1 && !Efeitos.eTocando(Efeitos.item_recebido)) {
@@ -518,7 +522,6 @@ public class Player extends Canvas {
 
 			}
 		}
-		return g;
 	}
 
 	public static void atack(boolean atack) {

@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 
+import br.Game;
 import br.input.*;
 import br.player.Player;
 
@@ -26,20 +27,23 @@ public class TesteMovimentacao implements State {
 			testando = false;
 		}
 		Player.defender(Input.defend);
+
 		Player.movimentar(Input.up, Input.down, Input.right, Input.left);
+
 		Player.update();
 	}
 
 	@Override
 	public void render(Graphics g) {
-
-		g.setColor(Color.RED);
-		g.fillRect(Player.player.x, Player.player.y, Player.player.width, Player.player.height);
+		g.setColor(Color.black);
+	g.fillRect(0,0, Game.WIDTH, Game.HEIGTH);
+		//g.setColor(Color.RED);
+		//g.fillRect(Player.player.x, Player.player.y, Player.player.width, Player.player.height);
 		if(testando) {g.fillRect(teste.x, teste.y, teste.width, teste.height);}
-		g.setColor(Color.BLUE);
-		g.fillRect(Player.arma.x, Player.arma.y, Player.arma.width, Player.arma.height);
-		g.setColor(Color.YELLOW);
-		g.fillRect(Player.escudo.x, Player.escudo.y, Player.escudo.width, Player.escudo.height);
+		//g.setColor(Color.BLUE);
+		//g.fillRect(Player.arma.x, Player.arma.y, Player.arma.width, Player.arma.height);
+		//g.setColor(Color.YELLOW);
+		//g.fillRect(Player.escudo.x, Player.escudo.y, Player.escudo.width, Player.escudo.height);
 		Player.animacao(g);
 	}
 

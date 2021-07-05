@@ -19,7 +19,7 @@ public class Game implements Runnable {
 
 	private StateManager sm;
 	private Display display;
-	public static final int WIDTH = 896, HEIGTH = 640, FPS = 60, ESCALA = 4;
+	public static final int WIDTH = 896, HEIGTH = 640, FPS = 60, ESCALA = 8;
 	public static final double TPS = 1000000000 / FPS;
 
 	public Game() {
