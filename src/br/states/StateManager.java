@@ -10,15 +10,16 @@ public class StateManager implements KeyListener {
 	public static State[] states = new State[numberStates];
 	public static byte currentState = 0;
 
-	public static final byte TITLE = 1, MOVE = 0;
+	public static final byte OVERWORLD = 2, TESOUROS = 1, TITLE = 0;
 	public static void setState(byte state) {
 		currentState = state;
 		states[currentState].init();
 	}
 
 	public StateManager() {
-		states[1]=new TitleScreen();
-		states[0]=new TesteMovimentacao();
+		states[2]=new OverWorld();
+		states[1]=new Tesouros();
+		states[0]=new TitleScreen();
 	}
 
 	public void update() {

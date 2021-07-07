@@ -3,8 +3,10 @@ package br.player;
 import java.awt.Canvas;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 import br.Game;
+import br.input.Input;
 import br.sons.Efeitos;
 import br.sons.Sons;
 
@@ -20,7 +22,7 @@ public class Player extends Canvas {
 	public static Rectangle player = new Rectangle(Game.WIDTH / 2 - 8*Game.ESCALA, Game.HEIGTH / 2 - 8*Game.ESCALA, 16*Game.ESCALA, 16*Game.ESCALA),
 							arma = new Rectangle(-500, -500, 1, 1),
 							escudo = new Rectangle(-500, -500, 1, 1);
-	private static final byte velocidade = 2;
+	public static final byte velocidade = 5;
 	private static byte
 						delay_up = 0,
 						delay_down = 0,
@@ -47,7 +49,7 @@ public class Player extends Canvas {
 	coletando = false,
 	mute = false;
 
-	public static void movimentar(boolean ups, boolean downs, boolean rigths, boolean lefts) {
+	private static void movimentar(boolean ups, boolean downs, boolean rigths, boolean lefts) {
 	if(!coletando) {
 		if (ups) {
 			if (!defendendo && !atacando) {
@@ -89,7 +91,7 @@ public class Player extends Canvas {
 			player.y += velocidade;
 		}
 
-		if (rigths) {
+		if (rigths && !ups && !downs) {
 			if (!defendendo && !atacando) {
 				rigth = true;
 				down = left = up = false;
@@ -108,7 +110,7 @@ public class Player extends Canvas {
 			}
 
 			player.x += velocidade;
-		} else if (lefts) {
+		} else if (lefts && !ups && !downs) {
 			if (!defendendo && !atacando) {
 				left = true;
 				down = up = rigth = false;
@@ -148,23 +150,10 @@ public class Player extends Canvas {
 	}
 	}
 
-	private static void limits() {
-		if (player.x < 0) {
-			player.x = 0;
-		}
-		if (player.y < 0) {
-			player.y = 0;
-		}
-		if (player.x + player.width > Game.WIDTH) {
-			player.x = Game.WIDTH - player.width;
-		}
-		if (player.y + player.height > Game.HEIGTH) {
-			player.y = Game.HEIGTH - player.height;
-		}
-	}
-
 	public static void update() {
-		limits();
+		defender(Input.defend);
+		atack(Input.atack);
+		movimentar( Input.up, Input.down, Input.right, Input.left);
 	}
 
 	public static void animacao(Graphics g) {
@@ -172,12 +161,16 @@ public class Player extends Canvas {
 		escudo.width=escudo.height=1;
 		if (!atacando && !defendendo && !coletando) {
 			if (up) {
+				Game.display.setIcon(Sprites.move_up[0]);
 				g.drawImage(Sprites.move_up[anima_sprite], player.x, player.y, player.width, player.height, null);
 			} else if (down) {
+				Game.display.setIcon(Sprites.move_down[0]);
 				g.drawImage(Sprites.move_down[anima_sprite], player.x, player.y, player.width, player.height, null);
 			} else if (rigth) {
+				Game.display.setIcon(Sprites.move_H[0]);
 				g.drawImage(Sprites.move_H[anima_sprite], player.x, player.y, player.width, player.height, null);
 			} else {
+				Game.display.setIcon(Sprites.move_H[0]);
 				g.drawImage(Sprites.move_H[anima_sprite], player.x + player.width, player.y, -player.width, player.height, null);
 			}
 		}
@@ -188,24 +181,28 @@ public class Player extends Canvas {
 				escudo.width=player.width;
 				escudo.x=player.x;
 				escudo.y=player.y-5;
+				Game.display.setIcon(Sprites.move_up[0]);
 				g.drawImage(Sprites.move_up[anima_sprite], player.x, player.y, player.width, player.height, null);
 			}else if(down) {
 				escudo.height=5;
 				escudo.width=player.width;
 				escudo.x=player.x;
 				escudo.y=player.y+player.height;
+				Game.display.setIcon(Sprites.shield_down[0]);
 				g.drawImage(Sprites.shield_down[anima_sprite], player.x, player.y, player.width, player.height, null);
 			}else if(rigth) {
 				escudo.height=player.height;
 				escudo.width=5;
 				escudo.x=player.x+player.width;
 				escudo.y=player.y;
+				Game.display.setIcon(Sprites.shield_H[0]);
 				g.drawImage(Sprites.shield_H[anima_sprite], player.x, player.y, player.width, player.height, null);
 			}else {
 				escudo.y=player.y;
 				escudo.height=player.height;
 				escudo.width=5;
 				escudo.x=player.x-5;
+				Game.display.setIcon(Sprites.shield_H[0]);
 				g.drawImage(Sprites.shield_H[anima_sprite], player.x + player.width, player.y, -player.width, player.height, null);
 			}
 		}
@@ -500,7 +497,7 @@ public class Player extends Canvas {
 		}
 
 		if(coletando) {
-
+			Game.display.setIcon(Sprites.item[1]);
 			g.drawImage(Sprites.item[colet_sprite], player.x, player.y, player.width, player.height, null);
 
 			delay_colet++;
@@ -515,26 +512,27 @@ public class Player extends Canvas {
 					delay_colet = colet_sprite = 0;
 				}
 			}
-			else if(atack_sprite == 1 && !Efeitos.eTocando(Efeitos.item_recebido)) {
+			else if(colet_sprite == 1 && !Efeitos.eTocando(Efeitos.item_recebido)) {
 				time_music=0;
 				coletando = false;
-				delay_atack = atack_sprite = 0;
+				delay_colet = colet_sprite = 0;
 
 			}
 		}
 	}
 
-	public static void atack(boolean atack) {
+	private static void atack(boolean atack) {
 		if(atack) {
 			precionando=true;
 		}
-		if(!atack && precionando) {
+		if(!atack && !atacando && precionando) {
 			precionando=false;
 			atacando = true;
+			Efeitos.play(Efeitos.sword_atack);
 		}
 	}
 
-	public static void defender(boolean shield) {
+	private static void defender(boolean shield) {
 		defendendo=shield;
 	}
 	public static void coletItem() {

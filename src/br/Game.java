@@ -18,21 +18,23 @@ public class Game implements Runnable {
 	private boolean running = false;
 
 	private StateManager sm;
-	private Display display;
-	public static final int WIDTH = 896, HEIGTH = 640, FPS = 60, ESCALA = 8;
+	public static Display display;
+	public static byte ESCALA = 3;
+	public static int WIDTH = 256 * ESCALA, HEIGTH = 176 * ESCALA, FPS = 60;
 	public static final double TPS = 1000000000 / FPS;
 
 	public Game() {
 		sm = new StateManager();
-		display = new Display("THE LEGENDS OF JAVA", WIDTH, HEIGTH);
 		km = new Teclado();
+		init();
+		display = new Display("THE LEGENDS OF JAVA", WIDTH, HEIGTH, "/sprites/icone.png");
+		Launch.carregado();
 		display.setKeyListener(sm);
 		display.setKeyListener(km);
 	}
 
 	@Override
 	public void run() {
-		init();
 		double tick = 0;
 		long now, lastTime = System.nanoTime();
 
@@ -54,7 +56,7 @@ public class Game implements Runnable {
 		Loader.load();
 		Sons.init();
 		Input.init();
-		StateManager.setState(StateManager.TITLE);
+		StateManager.setState(StateManager.OVERWORLD);
 	}
 
 	private void update() {
@@ -85,8 +87,4 @@ public class Game implements Runnable {
 		running = true;
 	}
 
-	public synchronized void stop() throws InterruptedException{
-		if(thread == null) { return; }
-		thread.join();
-	}
 }

@@ -18,7 +18,7 @@ public class Musicas {
 	}
 
 	public static void update() {
-		if(currentMusic != -1) {
+		if(currentMusic>=0) {
 			if(Sons.mute) {
 				music[currentMusic].pause();
 			}else if(!music[currentMusic].taTocando()) {

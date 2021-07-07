@@ -21,7 +21,7 @@ public class TitleScreen extends Canvas implements State {
 	public void update() {
 		time++;
 		if(Input.start) {
-			StateManager.setState(StateManager.MOVE);
+			StateManager.setState(StateManager.TESOUROS);
 		}
 		if(time>=10) {
 			anima++;
